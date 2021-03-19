@@ -24,45 +24,65 @@ namespace KoalaBot.Managers
 
             //_memcache = new Dictionary<ulong, Reply>(16);
 
+            //Bot.Discord.MessageUpdated += Discord_MessageUpdated;
+
             Bot.Discord.MessageUpdated += HandleCommandsAsync;
             Bot.Discord.MessageDeleted += HandleMessageDelete;
         }
 
-        private async Task HandleMessageDelete(DSharpPlus.EventArgs.MessageDeleteEventArgs e)
+        private Task Discord_MessageUpdated(DSharpPlus.DiscordClient sender, DSharpPlus.EventArgs.MessageUpdateEventArgs e)
         {
-            //Skip if its invalid
-            if (e == null) return;
-            if (e.Message == null) return;
-
-            await DeleteResponseAsync(e.Message, false);
+            throw new NotImplementedException();
         }
 
-        private async Task HandleCommandsAsync(DSharpPlus.EventArgs.MessageUpdateEventArgs e)
+        private Task HandleMessageDelete(object s, DSharpPlus.EventArgs.MessageDeleteEventArgs e)
         {
             //Skip if its invalid
-            if (e == null) return;
-            if (e.Author == null) return;
-            if (e.Author.IsBot) return;
+            if (e == null) return null;
+            if (e.Message == null) return null;
+
+            return DeleteResponseAsync(e.Message, false);
+        }
+
+        private Task HandleCommandsAsync(object s, DSharpPlus.EventArgs.MessageUpdateEventArgs e)
+        {
+            //Skip if its invalid
+            if (e == null) return null;
+            if (e.Author == null) return null;
+            if (e.Author.IsBot) return null;
 
             //Resolve the prefix
             var mpos = e.Message.GetMentionPrefixLength(Bot.Discord.CurrentUser);
-            if (mpos == -1) mpos = await Bot.ResolvePrefix(e.Message);
-            if (mpos == -1) return;
+            if (mpos == -1)
+            {
+                Task<int> r = Bot.ResolvePrefix(e.Message);
+                r.Wait();
+                mpos = r.Result;
+            }
+            if (mpos == -1) return null;
             var pfx = e.Message.Content.Substring(0, mpos);
 
             //Prepare the command
             var command = e.Message.Content.Substring(mpos);
             var cmd = Bot.CommandsNext.FindCommand(command, out var args);
-            if (cmd == null) return;
+            if (cmd == null) return null;
 
             //Make sure the user has permission to replay
             var member = e.Message.GetMember();
-            if (member != null && await member.HasPermissionAsync("koala.reply." + e.Channel.Id))
+
+            if (member != null)
             {
-                //Create a context and execute the command
-                var fctx = Bot.CommandsNext.CreateContext(e.Message, pfx, cmd, args);
-                await Bot.CommandsNext.ExecuteCommandAsync(fctx).ConfigureAwait(false);
+                var v = member.HasPermissionAsync("koala.reply." + e.Channel.Id);
+                v.Wait();
+                if (v.Result)
+                {
+                    //Create a context and execute the command
+                    var fctx = Bot.CommandsNext.CreateContext(e.Message, pfx, cmd, args);
+                    var x = Bot.CommandsNext.ExecuteCommandAsync(fctx).ConfigureAwait(false);
+                }
+                
             }
+            return null;
         }
         
         /// <summary>

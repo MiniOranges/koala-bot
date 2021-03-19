@@ -20,8 +20,8 @@ namespace KoalaBot.Entities
         private SemaphoreSlim _semaphore;
         private System.Timers.Timer _syncTimer;
 
-        public event AsyncEventHandler<ChangesSyncedEventArgs> ChangesSynced;
-        public class ChangesSyncedEventArgs : AsyncEventArgs
+        public event EventHandler<ChangesSyncedEventArgs> ChangesSynced;
+        public class ChangesSyncedEventArgs
         {
             public IReadOnlyCollection<ulong> UpdatedUsers { get; }
             public IReadOnlyCollection<ulong> UpdatedGuilds { get; }
@@ -63,7 +63,7 @@ namespace KoalaBot.Entities
             _syncTimer.Elapsed += async (sender, args) => await SyncChanges();
             _syncTimer.Start();
 
-            bot.Discord.MessageCreated += async (args) =>
+            bot.Discord.MessageCreated += async (s, args) =>
             {
                 if (args.Author.IsBot) return;
                 await RecordMessage(args.Message);
@@ -149,8 +149,14 @@ namespace KoalaBot.Entities
 
                 //Execute the transaction
                 await transaction.ExecuteAsync();
+
+                Func<Task> test = async () =>
+                {
+                    ChangesSynced(this, new ChangesSyncedEventArgs(changedUsers, changedGuilds));
+                };
+
                 if (ChangesSynced != null)
-                    await ChangesSynced?.Invoke(new ChangesSyncedEventArgs(changedUsers, changedGuilds));
+                    await test();
                 
                 //Clear the tallies
                 _userTallies.Clear();

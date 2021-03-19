@@ -71,7 +71,7 @@ namespace KoalaBot.Modules
                 try
                 {
                     await System.IO.File.WriteAllTextAsync(tmppath, export);
-                    await ctx.RespondWithFileAsync(tmppath, "Exported Groups:");
+                    //await ctx.RespondWithFileAsync(tmppath, "Exported Groups:");
                     await ctx.ReplyReactionAsync(true);
                 }
                 catch (Exception)
@@ -125,7 +125,7 @@ namespace KoalaBot.Modules
                 try
                 {
                     await System.IO.File.WriteAllTextAsync(tmppath, export);
-                    await ctx.RespondWithFileAsync(tmppath, "Exported Groups:");
+                    //await ctx.RespondWithFileAsync(tmppath, "Exported Groups:");
                     await ctx.ReplyReactionAsync(true);
                 }
                 catch (Exception)

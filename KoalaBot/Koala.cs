@@ -26,6 +26,7 @@ using DSharpPlus.Interactivity;
 using KoalaBot.Managers;
 using KoalaBot.Exceptions;
 using System.Net.Http;
+using DSharpPlus.Interactivity.Extensions;
 
 namespace KoalaBot
 {
@@ -112,7 +113,7 @@ namespace KoalaBot
             var curr = Assembly.GetExecutingAssembly();
             var part = Assembly.GetAssembly(typeof(Modules.Starwatch.StarwatchModule.ProtectionModule));
             this.CommandsNext.RegisterCommands(part);
-            this.CommandsNext.CommandExecuted += HandleCommandExecuteAsync;
+            //this.CommandsNext.CommandExecuted += HandleCommandExecuteAsync;
 
             Logger.Log("Creating Interactivity");
             this.Interactivity = this.Discord.UseInteractivity(new InteractivityConfiguration()
@@ -124,8 +125,8 @@ namespace KoalaBot
             //Catch when any errors occur in the command handler
             //Send any command errors back after logging it.
             Logger.Log("Registering Error Listeners");
-            this.Discord.ClientErrored += async (error) => await LogException(error.Exception);
-            this.CommandsNext.CommandErrored += HandleCommandErrorAsync;
+            this.Discord.ClientErrored += async (s, error) => await LogException(error.Exception);
+            //this.CommandsNext.CommandErrored += HandleCommandErrorAsync;
             
             Logger.Log("Done");
         }
@@ -229,18 +230,23 @@ namespace KoalaBot
         {
             Logger.LogError(exception);
             var hook = await Discord.GetWebhookAsync(Configuration.ErrorWebhook);
-            await hook.ExecuteAsync("An error has occured on " + Discord.CurrentApplication.Name + ". ", embeds: new DiscordEmbed[] {
-                exception.ToEmbed(),
-                new DiscordEmbedBuilder()
-                {
-                    Color = DiscordColor.Orange,
-                    Title = "Details",
-                    Timestamp = DateTime.UtcNow
-                }
-                .AddField("Guild", context?.Channel.GuildId.ToString())
-                .AddField("Channel", context?.Channel.Id.ToString())
-                .AddField("Message", context?.Id.ToString())
-            }, files: null);
+
+            var dwb = new DiscordWebhookBuilder();
+            dwb.Content = "An error has occured on " + Discord.CurrentApplication.Name + ". ";
+
+            // why do things like this? someone pls explain.
+
+            var deb = new DiscordEmbedBuilder();
+            deb.Color = DiscordColor.Orange;
+            deb.Title = "Details";
+            deb.Timestamp = DateTime.UtcNow;
+            deb.AddField("Guild", context?.Channel.GuildId.ToString())
+                        .AddField("Channel", context?.Channel.Id.ToString())
+                        .AddField("Message", context?.Id.ToString());
+
+            dwb.AddEmbed(deb);
+
+            await hook.ExecuteAsync(dwb);
         }
 
 

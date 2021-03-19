@@ -108,6 +108,7 @@ namespace KoalaBot.Redis
         /// <returns></returns>
         public async Task<Dictionary<string, string>> FetchHashMapAsync(string key)
         {
+            
             var hashvals = await DatabaseAsync.HashGetAllAsync(key);
             return ConvertHashEntries(hashvals);
         }
@@ -263,7 +264,15 @@ namespace KoalaBot.Redis
             Logger = logger ?? new Logging.Logger("REDIS", null);
 
             Logger.Log("Connecting to Redis: {0}", host);
-            ConnectionMultiplexer = ConnectionMultiplexer.Connect(host);
+
+            ConfigurationOptions co = new ConfigurationOptions
+            {
+                Ssl = false,
+                SslHost = host,
+                ConnectTimeout = 2000
+            };
+            
+            ConnectionMultiplexer = ConnectionMultiplexer.Connect("localhost", Console.Out);
 
             Logger.Log("Getting Database {0}", db);
             DatabaseAsync = Database = ConnectionMultiplexer.GetDatabase(db);

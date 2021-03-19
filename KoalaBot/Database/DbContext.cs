@@ -341,7 +341,10 @@ namespace KoalaBot.Database
                 throw new ArgumentNullException("query");
 
             //Try connect
-            if (!await OpenAsync()) return null;
+            if (!await OpenAsync())
+            {
+                return null;
+            }
 
             //Wait for the semephore
             Logger.Log("Creating Command, Waiting Semaphore.. {0}", _semaphore.CurrentCount);
@@ -428,6 +431,7 @@ namespace KoalaBot.Database
 
                     //Create the connection
                     _connection = new MySqlConnection(this.Settings.ConnectionString);
+                    int a = 1;
                     _connection.StateChange += async (sender, args) =>
                     {
                         //We have closed or broken, so lets close us.
@@ -465,7 +469,11 @@ namespace KoalaBot.Database
             {
                 //Close the connection asyncronously.
                 Logger.Log("Closing SQL");
-                await _connection.CloseAsync();
+                if (_connection != null)
+                {
+                    await _connection.CloseAsync();
+                }
+                
                 IsConnected = false;
             }
             catch (Exception e)
@@ -538,6 +546,7 @@ namespace KoalaBot.Database
                 try
                 {
                     var cmd = await CreateCommand(q);
+                    int a = 1;
                     await cmd.ExecuteScalarAsync();
                 }
                 catch(Exception e)

@@ -1,6 +1,5 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
-using DSharpPlus.Interactivity.Concurrency;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.EventHandling;
 using System;
@@ -84,7 +83,6 @@ namespace KoalaBot.Interactivity
 
             switch (_behaviour)
             {
-                case PaginationBehaviour.Default:
                 case PaginationBehaviour.Ignore:
                     if (index == _pages.Count - 1)
                         break;
@@ -109,7 +107,6 @@ namespace KoalaBot.Interactivity
 
             switch (_behaviour)
             {
-                case PaginationBehaviour.Default:
                 case PaginationBehaviour.Ignore:
                     if (index == 0)
                         break;
@@ -153,7 +150,6 @@ namespace KoalaBot.Interactivity
         {
             switch (_deletion)
             {
-                case PaginationDeletion.Default:
                 case PaginationDeletion.DeleteEmojis:
                     await _message.DeleteAllReactionsAsync();
                     break;

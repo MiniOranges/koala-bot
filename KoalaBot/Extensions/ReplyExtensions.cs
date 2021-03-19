@@ -115,8 +115,8 @@ namespace KoalaBot.Extensions
         /// <returns></returns>
         public static async Task ReplyPaginatedAsync(this CommandContext ctx,  IEnumerable<Page> pages, 
             PaginationEmojis emojis = null, 
-            PaginationBehaviour behaviour = PaginationBehaviour.Default, 
-            PaginationDeletion deletion = PaginationDeletion.Default, 
+            PaginationBehaviour behaviour = PaginationBehaviour.WrapAround, 
+            PaginationDeletion deletion = PaginationDeletion.KeepEmojis, 
             TimeSpan? timeoutoverride = null)
         {
             var m = await ctx.ReplyAsync(pages.First().Content, pages.First().Embed);
@@ -124,7 +124,7 @@ namespace KoalaBot.Extensions
 
             var ems = emojis ?? new PaginationEmojis();
             var prequest = new KoalaBot.Interactivity.PaginationRequest(m, ctx.Member, behaviour, deletion, ems, timeout, pages.ToArray());
-            await ctx.Client.GetInteractivity().WaitForCustomPaginationAsync(prequest);
+            //await ctx.Client.GetInteractivity().WaitForCustomPaginationAsync(prequest);
         }
     }
 }
