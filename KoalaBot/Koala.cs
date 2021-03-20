@@ -163,6 +163,9 @@ namespace KoalaBot
         {
             try
             {
+                if (message.Channel.Guild == null)
+                    return -1;
+
                 if (message.Author == null || message.Author.IsBot) return -1;
 
                 //Get the prefix. If we fail to find the prefix then we will get it from the cache

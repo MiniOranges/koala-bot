@@ -25,6 +25,9 @@ namespace KoalaBot.Extensions
         /// <returns></returns>
         public static async Task<string> GetPrefixAsync(DiscordGuild guild)
         {
+            if (guild == null)
+                return "\\";
+
             if (_prefixCache.TryGetValue(guild.Id, out var prefix))
                 return prefix;
 
