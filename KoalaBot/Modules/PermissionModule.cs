@@ -18,7 +18,7 @@ using KoalaBot.PermissionEngine;
 
 namespace KoalaBot.Modules
 {
-    [Group("perm"), RequirePermissions(DSharpPlus.Permissions.ManageMessages)]
+    [Group("perm")]
     public class PermissionModule : BaseCommandModule
     {
         public Koala Bot { get; }

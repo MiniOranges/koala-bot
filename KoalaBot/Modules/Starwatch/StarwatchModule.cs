@@ -78,12 +78,14 @@ namespace KoalaBot.Modules.Starwatch
             else embed.AddField("☠ Downtime", uptime);
 
             //Add the current connections
-            embed.AddField("Connections", statistics.Connections.ToString(), true);
-            embed.AddField("Connections This Session", statistics.LastConnectionID.GetValueOrDefault(0).ToString(), true);
+            embed.AddField("Current Connections", statistics.Connections.ToString(), true);
+            //embed.AddField("Connections This Session", statistics.LastConnectionID.GetValueOrDefault(0).ToString(), true);
 
             //Add the memory usage
+            /* to-do: fix I guess?
             embed.AddField("Cur Memory", string.Format("{0:n0}", statistics.Memory.WorkingSet / 1024 / 1024) + " MB", true);
             embed.AddField("Max Memory", string.Format("{0:n0}", statistics.Memory.PeakWorkingSet / 1024 / 1024) + " MB", true);
+            */
 
             await ctx.ReplyAsync(embed: embed.Build());
         }

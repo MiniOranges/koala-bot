@@ -19,9 +19,16 @@ namespace KoalaBot.Starwatch
 
         private HttpClient _httpClient;
         private string _authorization;
+        public string Username { get; }
+        public string Password { get; }
 
         public StarwatchClient(string host, string username, string password)
         {
+            // is this best practice? No.
+            // does it work? Yes.
+            this.Username = username;
+            this.Password = password;
+
             Host = host.TrimEnd('/');
             _httpClient = new HttpClient();
 
@@ -184,8 +191,18 @@ namespace KoalaBot.Starwatch
 
         #endregion
 
+        #region Kick
+
+        public async Task<Response<bool>> KickPlayerAsync(long cid, string reason) => await DeleteRequestAsync<bool>($"/player/{cid}?reason={reason}");
+
+        public async Task<Response<bool>> KickPlayerAsync(long cid, string reason, int duration) => await DeleteRequestAsync<bool>($"/player/{cid}?reason={reason}&duration={duration}");
+
+        #endregion
+
         #region Account
         public async Task<Response<Account>> GetAccountAsync(string name) => await GetRequestAsync<Account>($"/account/{name}");
+
+        public async Task<Response<Account>> CreateAccountAsync(string username, string password) => await PostRequestAsync<Account>($"/account?async=false&name={username}&password={password}&isadmin=false");
 
         public async Task<Response<Account>> UpdateAccountAsync(string name, Account account) => await PutRequestAsync<Account>($"/account/{name}", payload: account);
 

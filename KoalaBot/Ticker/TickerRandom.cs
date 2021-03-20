@@ -20,7 +20,7 @@ namespace KoalaBot.Ticker
 			"sick beatsies",
 			"like nobodies busniess",
 			"Parappa the Rapper",
-			"sweat salty tears",
+			"sweet salty tears",
 			"DarkSouls III",
 			"with B1nzy's Pings",
 			"with C++ meme libs", 

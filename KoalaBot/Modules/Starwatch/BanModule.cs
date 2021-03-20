@@ -20,7 +20,7 @@ namespace KoalaBot.Modules.Starwatch
     public partial class StarwatchModule
     {
         [Group("ban"), Aliases("b")]
-        [Description("Handles world backups.")]
+        [Description("Bans peeps.")]
         public partial class BanModule : BaseCommandModule
         {
             public Koala Bot { get; }
@@ -50,10 +50,10 @@ namespace KoalaBot.Modules.Starwatch
                 await ctx.ReplyReactionAsync(response.Payload);
             }
 
-            [Command("create"), Aliases("add", "+", "ban")]
+            [Command("ip")]
             [Permission("sw.ban.ip")]
             [Description("Creates a new ban")]
-            public async Task BanPlayer(CommandContext ctx,
+            public async Task BanPlayerIP(CommandContext ctx,
                 [Description("The IP address to ban.")] string ip, 
                 [Description("The reason for the ban.")] string reason)
             {
