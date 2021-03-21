@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -209,6 +211,22 @@ namespace KoalaBot.Starwatch
         public async Task<Response<bool>> DeleteAccountAsync(string name) => await DeleteRequestAsync<bool>($"/account/{name}");
 
         #endregion
+
+        public string SendMessage(string message)
+        {
+            string ep = Host + "/api/chat";
+            WebClient wc = new WebClient();
+            wc.Credentials = new NetworkCredential(Username, Password);
+
+            string postdata = JsonConvert.SerializeObject(new Dictionary<string, object>()
+            {
+                ["content"] = message,
+                ["async"] = false,
+                ["include_tag"] = false
+            });
+            string resp = wc.UploadString(ep, "POST", postdata);
+            return resp;
+        }
 
         /// <summary>
         /// Gets the statistics of the server
