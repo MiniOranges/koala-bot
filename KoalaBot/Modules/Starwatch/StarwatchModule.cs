@@ -16,6 +16,7 @@ using KoalaBot.Starwatch.Entities;
 using DSharpPlus.Interactivity;
 using KoalaBot.Util;
 using KoalaBot.Starwatch.Exceptions;
+using System.Diagnostics;
 
 namespace KoalaBot.Modules.Starwatch
 {
@@ -47,7 +48,7 @@ namespace KoalaBot.Modules.Starwatch
         [Command("restart")]
         [Description("Restarts the server with a given reason.")]
         [Permission("sw.restart")]
-        public async Task RestartServer(CommandContext ctx, [Description("Optional. Reason for the restart.")] [RemainingText] string reason)
+        public async Task RestartServer(CommandContext ctx, [Description("Optional. Reason for the restart.")][RemainingText] string reason)
         {
             if (string.IsNullOrWhiteSpace(reason))
                 reason = "Restarted by @" + ctx.Member.Nickname;
@@ -90,12 +91,14 @@ namespace KoalaBot.Modules.Starwatch
             await ctx.ReplyAsync(embed: embed.Build());
         }
 
+
+
         [Command("aliases")]
         [Description("Gets the aliases of a user")]
         [Permission("sw.alias")]
         public async Task SearchAliasSessions(CommandContext ctx, string name)
         {
-            //TODO: Deep Analyisis
+            //TODO: Deep Analysis
             //TODO: List all the names, ips, accounts instead of showing them as individual embeds.
             await ctx.ReplyWorkingAsync();
             var tFetchAsync1 = Starwatch.GetSessionsAsync(character: name);
@@ -132,11 +135,57 @@ namespace KoalaBot.Modules.Starwatch
         [Permission("sw.search")]
         public async Task SearchSessions(CommandContext ctx, [RemainingText] CommandQuery query)
         {
-            string account      = query.GetString("account", null);
-            string character    = query.GetString("character", null);
-            string uuid         = query.GetString("uuid", null);
-            string ip           = query.GetString("ip", null);
+            string account = query.GetString("account", null);
+            string character = query.GetString("character", null);
+            string uuid = query.GetString("uuid", null);
+            string ip = query.GetString("ip", null);
             await SearchSessions(ctx, account, character, ip, uuid);
+        }
+
+        [Command("kick")]
+        [Description("Kicks people")]
+        [Permission("sw.kick")]
+        public async Task KickUser(CommandContext ctx,
+            [RemainingText] CommandQuery query
+            //[Description("Account name to search")] string account = null,
+            //[Description("Character name to search")] string character = null,
+            //[Description("IP address to search")] string ip = null,
+            //[Description("UUID to search")] string uuid = null,
+            //[Description("Reason")] string reason = "Disconnected for inactivity."
+        )
+        {
+            await ctx.ReplyWorkingAsync();
+
+            string account = query.GetString("account", null);
+            string character = query.GetString("character", null);
+            string uuid = query.GetString("uuid", null);
+            string ip = query.GetString("ip", null);
+            string reason = query.GetString("reason", "Disconnected for inactivity.");
+
+            if (account == null && character == null && uuid == null && ip == null)
+            {
+                await ctx.ReplyAsync("Must specify a user to kick.");
+                return;
+            }
+
+            var response = await Starwatch.GetSessionsAsync(account, character, ip, uuid);
+
+            //Something else, throw an exception
+            if (response.Status != RestStatus.OK)
+                throw new RestResponseException(response);
+
+            int usersKicked = 0;
+
+            foreach (Session s in response.Payload)
+            {
+                if (s.DisconnectedAt == null)
+                {
+                    usersKicked++;
+                    await Starwatch.KickPlayerAsync(s.Connection, reason);
+                }
+            }
+
+            await ctx.ReplyAsync($"Kicked {usersKicked} users.");
         }
 
         [Command("search")]
