@@ -40,7 +40,6 @@ namespace KoalaBot.Ticker
 			"We are number one but everytime robbie rotten speaks it gets a little bit faster",
 			"the entire bee movie script",
 			"Party Crashers",
-            "Stallion's erotic Visual Novel",
             "cruoton",
             "albion online",
             "starbound",
