@@ -195,7 +195,27 @@ namespace KoalaBot.Starwatch
 
         #region Kick
 
-        public async Task<Response<bool>> KickPlayerAsync(long cid, string reason) => await DeleteRequestAsync<bool>($"/player/{cid}?reason={reason}");
+        public async Task<Response<bool>> KickPlayerAsync(long cid, string reason)
+        {
+            // I don't like this code...
+            // but I'm getting Newtonsoft.Json errors if I don't.
+            /*
+                Exception thrown: 'System.ArgumentException' in Newtonsoft.Json.dll
+                Exception thrown: 'System.ArgumentException' in System.Private.CoreLib.dll
+                Exception thrown: 'System.ArgumentException' in System.Private.CoreLib.dll
+                Exception thrown: 'System.ArgumentException' in System.Private.CoreLib.dll
+                Exception thrown: 'System.ArgumentException' in System.Private.CoreLib.dll 
+                                                                                            */
+            try
+            {
+                return await DeleteRequestAsync<bool>($"/player/{cid}?reason={reason}");
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            
+        }
 
         public async Task<Response<bool>> KickPlayerAsync(long cid, string reason, int duration) => await DeleteRequestAsync<bool>($"/player/{cid}?reason={reason}&duration={duration}");
 
@@ -224,6 +244,8 @@ namespace KoalaBot.Starwatch
                 ["async"] = false,
                 ["include_tag"] = false
             });
+
+
             string resp = wc.UploadString(ep, "POST", postdata);
             return resp;
         }
