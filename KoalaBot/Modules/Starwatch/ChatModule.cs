@@ -76,22 +76,6 @@ namespace KoalaBot.Modules.Starwatch
             }
 
 
-            [Command("delete"), Aliases("unban", "pardon", "-", "remove")]
-            [Permission("sw.ban.ip")]
-            [Description("Deletes a ban")]
-            public async Task DeleteBan(CommandContext ctx, [Description("The ticket number of the ban")] long ticket)
-            {
-                await ctx.ReplyWorkingAsync();
-                var response = await Starwatch.DeleteBanAsync(ticket);
-
-                if (response.Status != RestStatus.OK)
-                    throw new RestResponseException(response);
-
-                //Build the response                
-                await ctx.ReplyReactionAsync(response.Payload);
-            }
-
-
         }
     }
 }
