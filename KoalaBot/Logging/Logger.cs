@@ -184,7 +184,7 @@ namespace KoalaBot.Logging
 		/// </summary>
 		/// <param name="exception">The exception</param>
 		/// <param name="prefix">Formatting of the exception message</param>
-		public void LogError(Exception exception, string prefix = "Exception Occured.")
+		public void LogError(Exception exception, string prefix = "Exception Occurred.")
 		{
 			//Log the message of the exception
 			LogError("{0} {1}", prefix, exception.Message);

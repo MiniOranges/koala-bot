@@ -11,6 +11,7 @@ namespace KoalaBot.Ticker
 	class TickerStarwatch : ITickable
 	{
         public StarwatchClient Client { get; }
+        private bool FirstCall = true;
 
         public TickerStarwatch(StarwatchClient client)
         {
@@ -19,6 +20,13 @@ namespace KoalaBot.Ticker
 
 		public async Task<DiscordActivity> GetActivityAsync(TickerManager manager)
         {
+            // First call is a bit too heavy for startup. Using this makes it wait just long enough to not cause event timeouts.
+            if (FirstCall)
+            {
+                FirstCall = false;
+                return null;
+            }
+
             try
             {
                 var stats = await Client.GetStatisticsAsync();
