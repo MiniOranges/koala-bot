@@ -47,6 +47,7 @@ namespace KoalaBot.Modules.Starwatch
 
                 // this endpoint just hates everything.
                 // so we gotta do things differently.
+
                 WebClient wc = new WebClient();
                 wc.Credentials = new NetworkCredential(Starwatch.Username, Starwatch.Password);
 
@@ -59,12 +60,11 @@ namespace KoalaBot.Modules.Starwatch
                 try
                 {
                     string resp = wc.UploadString(Starwatch.Host + "/api/account", JsonConvert.SerializeObject(ac));
-                    Response<Account> respe = JsonConvert.DeserializeObject<Response<Account>>(resp);
+                    Response<Account> respObj = JsonConvert.DeserializeObject<Response<Account>>(resp);
 
-                    if (respe.Status != 0)
+                    if (respObj.Status != 0)
                     {
-                        await ctx.ReplyAsync("Hmm: " + respe.Message);
-
+                        await ctx.ReplyAsync("HTTP Status: " + respObj.Message);
                     }
                     else
                     {
@@ -73,58 +73,33 @@ namespace KoalaBot.Modules.Starwatch
                 }
                 catch (WebException ex)
                 {
-                    Debug.Write(ex.ToString());
-                    Console.WriteLine(ex.ToString());
+                    Logger.LogError(ex.ToString());
+
                     string rt = "";
+
                     using (var reader = new System.IO.StreamReader(ex.Response.GetResponseStream()))
                     {
                         rt = reader.ReadToEnd();
                     }
-                    Console.WriteLine(rt);
-                    await ctx.ReplyAsync("Uh wex:\n" + rt);
+
+                    Logger.LogError(rt);
+
+                    Response<Account> t = JsonConvert.DeserializeObject<Response<Account>>(rt);
+
+                    if (t.Message != null)
+                    {
+                        await ctx.ReplyAsync(t.Message);
+                    }
+                    else
+                    {
+                        await ctx.ReplyAsync("A web exception occurred processing this command.");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    await ctx.ReplyAsync("Uh ex:\n" + ex.ToString());
+                    Logger.LogError(ex.ToString());
+                    await ctx.ReplyAsync("An exception occurred processing this command.");
                 }
-
-                /*
-                await ctx.ReplyWorkingAsync();
-                try
-                {
-                    var response = await Starwatch.CreateAccountAsync(account, password);
-
-                    await ctx.ReplyAsync("Uh:\n```" + JsonConvert.SerializeObject(response) + "```");
-
-
-                    if (response.Status != RestStatus.OK)
-                    {
-                        throw new RestResponseException(response);
-                    }
-
-                    await ctx.ReplyReactionAsync(true);
-                }
-                catch (HttpRequestException ex)
-                {
-                    
-                }
-                catch (WebException ex)
-                {
-                    string rt = "";
-                    using (var reader = new System.IO.StreamReader(ex.Response.GetResponseStream()))
-                    {
-                        rt = reader.ReadToEnd();
-                    }
-                    await ctx.ReplyAsync("Uh wex:\n" + rt);
-                }
-                catch (Exception ex)
-                {
-                    await ctx.ReplyAsync("Uh:\n" + ex.ToString());
-                    Debug.WriteLine("Something happened: " + ex.ToString());
-                }
-                
-                */
-                
             }
 
             [Command("enable")]
@@ -134,8 +109,6 @@ namespace KoalaBot.Modules.Starwatch
             {
                 await ctx.ReplyWorkingAsync();
                 var response = await Starwatch.UpdateAccountAsync(account, new Account() { IsActive = true});
-
-                
 
                 if (response.Status != RestStatus.OK)
                     throw new RestResponseException(response);
