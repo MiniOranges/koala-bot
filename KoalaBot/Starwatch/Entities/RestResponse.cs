@@ -19,7 +19,7 @@ namespace KoalaBot.Starwatch.Entities
         public RestStatus Status { get; protected set; }
 
         /// <summary>
-        /// Was the request succesful?
+        /// Was the request successful?
         /// </summary>
         public bool Success => Status == RestStatus.OK || Status == RestStatus.Async;
         public bool IsAsync => Status == RestStatus.Async;
