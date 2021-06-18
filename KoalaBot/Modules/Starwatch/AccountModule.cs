@@ -127,6 +127,118 @@ namespace KoalaBot.Modules.Starwatch
                 
             }
 
+            [Command("createadmin")]
+            [Permission("sw.acc.createadmin")]
+            [Description("Creates an admin account")]
+            public async Task CreateAccountAdmin(CommandContext ctx, [Description("The name of the account to create")] string account, [Description("The password to use")] string password)
+            {
+                await ctx.ReplyWorkingAsync();
+
+                // this endpoint just hates everything.
+                // so we gotta do things differently.
+
+                WebClient wc = new WebClient();
+                wc.Credentials = new NetworkCredential(Starwatch.Username, Starwatch.Password);
+
+                Account ac = new Account();
+                ac.Name = account;
+                ac.Password = password;
+                ac.IsActive = true;
+                ac.IsAdmin = true;
+
+                try
+                {
+                    string resp = wc.UploadString(Starwatch.Host + "/api/account", JsonConvert.SerializeObject(ac));
+                    Response<Account> respObj = JsonConvert.DeserializeObject<Response<Account>>(resp);
+
+                    if (respObj.Status != 0)
+                    {
+                        await ctx.ReplyAsync("HTTP Status: " + respObj.Message);
+                    }
+                    else
+                    {
+                        await ctx.ReplyReactionAsync(true);
+                    }
+                }
+                catch (WebException ex)
+                {
+                    Logger.LogError(ex.ToString());
+
+                    string rt = "";
+
+                    using (var reader = new System.IO.StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        rt = reader.ReadToEnd();
+                    }
+
+                    Logger.LogError(rt);
+
+                    Response<Account> t = JsonConvert.DeserializeObject<Response<Account>>(rt);
+
+                    if (t.Message != null)
+                    {
+                        await ctx.ReplyAsync(t.Message);
+                    }
+                    else
+                    {
+                        await ctx.ReplyAsync("A web exception occurred processing this command.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.ToString());
+                    await ctx.ReplyAsync("An exception occurred processing this command.");
+                }
+            }
+
+            [Command("changepass")]
+            [Permission("sw.acc.changepass")]
+            [Description("Changes an account password")]
+
+            public async Task ChangeAccountPassword (CommandContext ctx, [Description("The name of the account to enable")] string account, [Description("Pass")] string password)
+            {
+                await ctx.ReplyWorkingAsync();
+                var response = await Starwatch.UpdateAccountAsync(account, new Account() { Password = password });
+
+                if (response.Status != RestStatus.OK)
+                    throw new RestResponseException(response);
+
+                //Build the response                
+                await ctx.ReplyReactionAsync(true);
+            }
+
+            [Command("demote")]
+            [Permission("sw.acc.demote")]
+            [Description("Demotes an account")]
+
+            public async Task DemoteAccount(CommandContext ctx, [Description("The name of the account to enable")] string account)
+            {
+                await ctx.ReplyWorkingAsync();
+                var response = await Starwatch.UpdateAccountAsync(account, new Account() { IsAdmin = false });
+
+                if (response.Status != RestStatus.OK)
+                    throw new RestResponseException(response);
+
+                //Build the response                
+                await ctx.ReplyReactionAsync(true);
+            }
+
+            [Command("promote")]
+            [Permission("sw.acc.promote")]
+            [Description("Promotes an account")]
+
+            public async Task PromoteAccount(CommandContext ctx, [Description("The name of the account to enable")] string account)
+            {
+                await ctx.ReplyWorkingAsync();
+                var response = await Starwatch.UpdateAccountAsync(account, new Account() { IsAdmin = true });
+
+                if (response.Status != RestStatus.OK)
+                    throw new RestResponseException(response);
+
+                //Build the response                
+                await ctx.ReplyReactionAsync(true);
+            }
+
             [Command("enable")]
             [Permission("sw.acc.enable")]
             [Description("Enables an account")]
