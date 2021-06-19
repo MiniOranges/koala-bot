@@ -239,6 +239,35 @@ namespace KoalaBot.Modules.Starwatch
                 await ctx.ReplyReactionAsync(true);
             }
 
+            [Command("get")]
+            [Permission("sw.acc.get")]
+            [Description("Gets an account")]
+            public async Task GetAccount (CommandContext ctx, [Description("The name of the account to get")] string account)
+            {
+                await ctx.ReplyWorkingAsync();
+                var response = await Starwatch.GetAccountAsync(account);
+
+                if (response.Status != RestStatus.OK)
+                {
+                    throw new RestResponseException(response);
+                }
+
+                if (response.Payload == null)
+                {
+                    await ctx.ReplyAsync("User not found.");
+                }
+                else
+                {
+                    string output = "```\n" +
+                        "Username: " + (response.Payload.Name ?? "null") + "\n" +
+                        "IsAdmin: " + response.Payload.IsAdmin + "\n" +
+                        "IsActive: " + response.Payload.IsActive + "\n" +
+                        "```";
+                    await ctx.ReplyAsync(output);
+
+                }
+            }
+
             [Command("enable")]
             [Permission("sw.acc.enable")]
             [Description("Enables an account")]
@@ -259,7 +288,7 @@ namespace KoalaBot.Modules.Starwatch
             [Command("disable")]
             [Permission("sw.acc.disable")]
             [Description("Disables an account")]
-            public async Task DisableAccount(CommandContext ctx, [Description("The name of the account to enable")] string account)
+            public async Task DisableAccount(CommandContext ctx, [Description("The name of the account to disable")] string account)
             {
                 await ctx.ReplyWorkingAsync();
                 var response = await Starwatch.UpdateAccountAsync(account, new Account() { IsActive = false });
