@@ -300,6 +300,26 @@ namespace KoalaBot.Modules.Starwatch
                 await ctx.ReplyReactionAsync(true);
             }
 
+            [Command("delete")]
+            [Permission("sw.acc.delete")]
+            [Description("Deletes an account")]
+            public async Task DeleteAccount(CommandContext ctx, [Description("The name of the account to delete")] string account)
+            {
+                await ctx.ReplyWorkingAsync();
+                try
+                {
+                    var response = await Starwatch.DeleteAccountAsync(account);
+                }
+                catch
+                {
+                    await ctx.ReplyAsync("No such account.");
+                    return;
+                }
+
+                //Build the response                
+                await ctx.ReplyReactionAsync(true);
+            }
+
         }
     }
 }
