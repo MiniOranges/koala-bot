@@ -92,19 +92,22 @@ namespace KoalaBot.Modules.Starwatch
                 //Fetch the response
                 await ctx.ReplyWorkingAsync();
 
-                //res
-                var response = await Starwatch.GetBanAsync(ticket);
-
-                //404, the world doesn't exist
-                if (response.Status == RestStatus.ResourceNotFound)
+                Response<Ban> response;
+                try
                 {
-                    await ctx.ReplyAsync(ticket + " is not a valid ban.");
+                    response = await Starwatch.GetBanAsync(ticket);
+                }
+                catch
+                {
+                    // 404 errors
+                    await ctx.ReplyAsync("Ticket #" + ticket + " has either been closed or has not been created yet.");
                     return;
                 }
 
-                //Something else, throw an exception
                 if (response.Status != RestStatus.OK)
+                {
                     throw new RestResponseException(response);
+                }
 
                 //Build the response                
                 await ctx.ReplyAsync(embed: BuildBanEmbed(response.Payload));
