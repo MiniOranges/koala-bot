@@ -171,7 +171,7 @@ namespace KoalaBot.Modules.Starwatch
                     Name = name
                 });
 
-                await ctx.ReplyReactionAsync(response.Status != RestStatus.OK);
+                await ctx.ReplyReactionAsync(response.Status == RestStatus.OK);
             }
 
             [Command("delete"), Aliases("unprotect")]

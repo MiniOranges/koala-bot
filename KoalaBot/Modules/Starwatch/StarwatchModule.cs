@@ -262,14 +262,13 @@ namespace KoalaBot.Modules.Starwatch
 
             //Download the file, then upload it again
             var url = ctx.Message.Attachments[0].Url;
-            using (var client = new System.Net.WebClient())
-            {
+            var client = new System.Net.WebClient();
                 string tmpname = Path.GetTempFileName();
                 try
                 {
                     //Throws unauth
                     await client.DownloadFileTaskAsync(new Uri(url), tmpname);
-                    byte[] response = await client.UploadFileTaskAsync(new Uri($"http://localhost:8000/world/{world}"), tmpname);
+                    byte[] response = await client.UploadFileTaskAsync(new Uri($"http://sb.ilovebacons.com:4242/world/{world}"), tmpname);
                     await ctx.ReplyAsync(content: Encoding.UTF8.GetString(response));
                 }
                 catch(Exception e)
@@ -281,8 +280,6 @@ namespace KoalaBot.Modules.Starwatch
                     if (File.Exists(tmpname))
                         File.Delete(tmpname);
                 }
-
-            }
         }
     }
 }

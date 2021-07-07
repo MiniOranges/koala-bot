@@ -41,6 +41,18 @@ namespace KoalaBot.Extensions
         {
             //Evaluate the permission and check if its true
             var state = (await CheckPermissionAsync(member, permission, bypassAdmin, bypassOwner));
+            if (state == StateType.Allow)
+            {
+                Debug.WriteLine("OK - " + permission);
+            }
+            else if (allowUnset && state == StateType.Unset)
+            {
+                Debug.WriteLine("OK 2 - " + permission);
+            }
+            else
+            {
+                Debug.WriteLine("No permission! - " + permission);
+            }
             return state == StateType.Allow || (allowUnset && state == StateType.Unset);
         }
 
