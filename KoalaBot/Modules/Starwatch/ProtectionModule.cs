@@ -41,9 +41,6 @@ namespace KoalaBot.Modules.Starwatch
                 if (world == null)
                     throw new ArgumentNullException("world");
 
-                if (!await ctx.Member.HasPermissionAsync($"sw.protection.list.{world.Whereami}", false, allowUnset: true))
-                    throw new PermissionException($"sw.protection.list.{world.Whereami}");
-
                 //Fetch the response
                 await ctx.ReplyWorkingAsync();
                 var response = await Starwatch.GetProtectionAsync(world);
@@ -83,8 +80,6 @@ namespace KoalaBot.Modules.Starwatch
                 if (string.IsNullOrWhiteSpace(account))
                     throw new ArgumentNullException("account");
 
-                if (!await ctx.Member.HasPermissionAsync($"sw.protection.check.{world.Whereami}", false, allowUnset: true))
-                    throw new PermissionException($"sw.protection.check.{world.Whereami}");
 
                 //Get the response
                 await ctx.ReplyWorkingAsync();
@@ -120,8 +115,6 @@ namespace KoalaBot.Modules.Starwatch
                 if (string.IsNullOrWhiteSpace(account))
                     throw new ArgumentNullException("account");
 
-                if (!await ctx.Member.HasPermissionAsync($"sw.protection.add.{world.Whereami}", false, allowUnset: true))
-                    throw new PermissionException($"sw.protection.add.{world.Whereami}");
 
                 //Adds an account to the protection
                 var response = await Starwatch.CreateProtectedAccountAsync(world, account, ctx.Member + " added user");
@@ -171,7 +164,7 @@ namespace KoalaBot.Modules.Starwatch
                     Name = name
                 });
 
-                await ctx.ReplyReactionAsync(response.Status != RestStatus.OK);
+                await ctx.ReplyReactionAsync(response.Status == RestStatus.OK);
             }
 
             [Command("delete"), Aliases("unprotect")]

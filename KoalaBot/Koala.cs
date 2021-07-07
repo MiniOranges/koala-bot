@@ -49,7 +49,6 @@ namespace KoalaBot
         public TickerManager TickerManager { get; }
         public MessageCounter MessageCounter { get; }
         public ModerationManager ModerationManager { get; }
-        public PermissionManager PermissionManager { get; }
         public ReplyManager ReplyManager { get; }
         public ReactRoleManager ReactRoleManager { get; }
         public StarwatchClient Starwatch { get; }
@@ -82,7 +81,6 @@ namespace KoalaBot
             //Make sure the user isn't updating to bypass moderative actions
             Logger.Log("Creating Instances....");
             ModerationManager = new ModerationManager(this);
-            PermissionManager = new PermissionManager(this, Logger.CreateChild("PERM"));
             ReplyManager = new ReplyManager(this, Logger.CreateChild("REPLY"));
             ReactRoleManager = new ReactRoleManager(this, Logger.CreateChild("ROLE"));
             TickerManager = new TickerManager(this, Logger.CreateChild("TICKER")) { Interval = 120 * 1000 };
@@ -104,8 +102,6 @@ namespace KoalaBot
                 .AddSingleton(this)
                 .BuildServiceProvider(true);
             this.CommandsNext = this.Discord.UseCommandsNext(new CommandsNextConfiguration() { PrefixResolver = ResolvePrefix, Services = deps });
-            this.CommandsNext.RegisterConverter(new PermissionArgumentConverter());
-            this.CommandsNext.RegisterConverter(new MemberPermissionArgumentConverter());
             this.CommandsNext.RegisterConverter(new QueryConverter());
             this.CommandsNext.RegisterConverter(new CommandQueryArgumentConverter());
             this.CommandsNext.RegisterConverter(new Starwatch.CommandNext.WorldConverter(this));
@@ -184,8 +180,6 @@ namespace KoalaBot
                     //Make sure we are allowed to execute in this channel
                     // We want to be able to execute in this channel unless specifically denied.
                     var member = await message.Channel.Guild.GetMemberAsync(message.Author.Id);
-                    var state = await member.HasPermissionAsync($"koala.execute.{message.ChannelId}", bypassAdmin: true, allowUnset: true);
-                    if (!state) return -1;
                 }
 
                 //Return the index of the prefix
