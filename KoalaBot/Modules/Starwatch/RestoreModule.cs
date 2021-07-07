@@ -42,9 +42,6 @@ namespace KoalaBot.Modules.Starwatch
                 if (world == null)
                     throw new ArgumentNullException("world");
 
-                if (!await ctx.Member.HasPermissionAsync($"sw.backup.list.{world.Whereami}", false, allowUnset: true))
-                    throw new PermissionException($"sw.backup.list.{world.Whereami}");
-
                 //Fetch the response
                 await ctx.ReplyWorkingAsync();
                 var response = await Starwatch.GetRestoreAsync(world);
@@ -131,8 +128,6 @@ namespace KoalaBot.Modules.Starwatch
                 if (world == null)
                     throw new ArgumentNullException("world");
 
-                if (!await ctx.Member.HasPermissionAsync($"sw.backup.delete.{world.Whereami}", false, allowUnset: true))
-                    throw new PermissionException($"sw.backup.delete.{world.Whereami}");
 
                 //Fetch the response
                 await ctx.ReplyWorkingAsync();

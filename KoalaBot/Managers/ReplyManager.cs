@@ -72,14 +72,11 @@ namespace KoalaBot.Managers
 
             if (member != null)
             {
-                var v = member.HasPermissionAsync("koala.reply." + e.Channel.Id);
-                v.Wait();
-                if (v.Result)
-                {
+
                     //Create a context and execute the command
                     var fctx = Bot.CommandsNext.CreateContext(e.Message, pfx, cmd, args);
                     var x = Bot.CommandsNext.ExecuteCommandAsync(fctx).ConfigureAwait(false);
-                }
+                
                 
             }
             return null;

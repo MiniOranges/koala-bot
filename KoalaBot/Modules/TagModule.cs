@@ -39,10 +39,6 @@ namespace KoalaBot.Modules
             Tag tag = await GetTagAsync(ctx.Guild, name);
             if (tag == null) throw new ArgumentException($"The tag {name} does not exist", nameof(name));
 
-            //Make sure we are the owner
-            if (ctx.Member.Id != tag.Owner && !await ctx.Member.HasPermissionAsync("koala.tag.delete.others"))
-                throw new Exception("You cannot remove someone else's tag.");
-
             await RemoveTagAsync(ctx.Guild, tag);
             await ctx.ReplyReactionAsync(true);
         }
