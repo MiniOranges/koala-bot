@@ -41,9 +41,6 @@ namespace KoalaBot.Modules.Starwatch
                 if (world == null)
                     throw new ArgumentNullException("world");
 
-                if (!await ctx.Member.HasPermissionAsync($"sw.protection.list.{world.Whereami}", false, allowUnset: true))
-                    throw new PermissionException($"sw.protection.list.{world.Whereami}");
-
                 //Fetch the response
                 await ctx.ReplyWorkingAsync();
                 var response = await Starwatch.GetProtectionAsync(world);
